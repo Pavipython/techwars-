@@ -34,11 +34,11 @@ def handlemovement(cr,gr,keys):
         cr.x+=10
     if keys [pygame.K_LEFT] and cr.x > 0:
         cr.x-=10
-    if (random.randint(1,100)<4):
+    if (random.randint(1,90)<4):
         # gr.x=random.randint(border.x+border.width,W-gr.width)
         if gr.x > border.x+border.width and gr.x < W-gr.width-100 and gr.y > 10 and gr.y < H-gr.height:
-            gr.x +=random.randint(-100,100)
-            gr.y +=random.randint(-100,100)
+            gr.x +=random.randint(-50,50)
+            gr.y +=random.randint(-150,150)
 
 
 def handlebullets(cr,gr,lasers,boulders):
