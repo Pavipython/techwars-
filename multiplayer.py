@@ -9,8 +9,8 @@ cyborg=pygame.transform.flip(cyborg,True,False)
 golem=pygame.transform.scale(pygame.image.load("golem.png"),(300,300))
 border=pygame.Rect(W/2-25,0,50,H)
 fence=pygame.transform.scale(pygame.image.load("Fence.png"),(50,H))
-laser=pygame.transform.scale(pygame.image.load("laser.png"),(100,20))
-boulder=pygame.transform.scale(pygame.image.load("meteor1.png"),(80,60))
+laser=pygame.transform.scale(pygame.image.load("laser.png"),(100,100))
+boulder=pygame.transform.scale(pygame.image.load("meteor1.png"),(100,100))
 def draw(cr,gr,lasers,boulders):
     techwars.blit(bg,(0,0))
     # pygame.draw.rect(techwars,"cyan",cr)
@@ -41,8 +41,30 @@ def handlemovement(cr,gr,keys):
             gr.y +=random.randint(-150,150)
 
 
-def handlebullets(cr,gr,lasers,boulders):
-    pass
+def handlebullets(cr,gr,lasers,boulders,cyborgscore,golemscore):
+    for i in lasers:
+        i.x+=10
+        if i.x > W:
+            lasers.remove(i)
+        if i.colliderect(gr):
+            lasers.remove(i)
+    for i in boulders:
+        i.x-=10
+        if i.x < 0:
+            boulders.remove(i)
+        if i.colliderect(cr):
+            boulders.remove(i)
+            continue
+        for l in lasers:
+            if l.colliderect(i):
+                boulders.remove(i)
+                lasers.remove(l)
+                break
+    return cyborgscore,golemscore    
+        
+
+    
+    
 
 
 def main():
@@ -50,6 +72,8 @@ def main():
     gr=pygame.Rect(W-400,H/2,220,260)
     lasers=[]
     boulders=[]
+    golemscore=0
+    cyborgscore=0
 
 
     while True:
@@ -67,7 +91,7 @@ def main():
         if random.randint(1,100) < 5:
             bullet=pygame.Rect(gr.x , gr.y + gr.height -100, 80,60)
             boulders.append(bullet)
-        handlebullets(cr,gr,lasers,boulders)
+        golemscore,cyborgscore = handlebullets(cr,gr,lasers,boulders,golemscore,cyborgscore)
         pygame.display.update()
 
 main()
