@@ -11,7 +11,10 @@ border=pygame.Rect(W/2-25,0,50,H)
 fence=pygame.transform.scale(pygame.image.load("Fence.png"),(50,H))
 laser=pygame.transform.scale(pygame.image.load("laser.png"),(100,100))
 boulder=pygame.transform.scale(pygame.image.load("meteor1.png"),(100,100))
-def draw(cr,gr,lasers,boulders):
+instructorfont=pygame.font.SysFont("Arial",25,True,True)
+scorefont=pygame.font.SysFont("Arial",40)
+
+def draw(cr,gr,lasers,boulders,cyborgscore,golemscore):
     techwars.blit(bg,(0,0))
     # pygame.draw.rect(techwars,"cyan",cr)
     # pygame.draw.rect(techwars,"cyan",gr)
@@ -23,7 +26,11 @@ def draw(cr,gr,lasers,boulders):
         techwars.blit(laser,(i.x, i.y))
     for i in boulders:
             # pygame.draw.rect(techwars,"brown", i)
-            techwars.blit(boulder,(i.x, i.y))    
+            techwars.blit(boulder,(i.x, i.y))  
+    cyborgtext=scorefont.render(f"Score:{cyborgscore}",1,"green")
+    golemtext=scorefont.render(f"score:{golemscore}",1,"red")
+    techwars.blit(cyborgtext,(50,50))
+    techwars.blit(golemtext,(W-300,50))  
 
 def handlemovement(cr,gr,keys):
     if keys [pygame.K_UP] and cr.y > 10:
@@ -36,24 +43,31 @@ def handlemovement(cr,gr,keys):
         cr.x-=10
     if (random.randint(1,90)<4):
         # gr.x=random.randint(border.x+border.width,W-gr.width)
-        if gr.x > border.x+border.width and gr.x < W-gr.width-100 and gr.y > 10 and gr.y < H-gr.height:
-            gr.x +=random.randint(-50,50)
-            gr.y +=random.randint(-150,150)
+        # if gr.x > border.x+border.width and gr.x < W-gr.width-100 and gr.y > 10 and gr.y < H-gr.height:
+        gr.x +=random.randint(-50,50)
+        gr.y +=random.randint(-150,150)
+        gr.x = max(border.x+border.width,gr.x)
+        gr.x = min(W-gr.width,gr.x)
+        gr.y = max(10,gr.y)
+        gr.y = min(H-gr.height,gr.y)
 
 
 def handlebullets(cr,gr,lasers,boulders,cyborgscore,golemscore):
+
     for i in lasers:
         i.x+=10
         if i.x > W:
             lasers.remove(i)
         if i.colliderect(gr):
             lasers.remove(i)
+            cyborgscore+=1
     for i in boulders:
         i.x-=10
         if i.x < 0:
             boulders.remove(i)
         if i.colliderect(cr):
             boulders.remove(i)
+            golemscore+=1
             continue
         for l in lasers:
             if l.colliderect(i):
@@ -77,7 +91,7 @@ def main():
 
 
     while True:
-        draw(cr,gr,lasers,boulders)
+        draw(cr,gr,lasers,boulders,cyborgscore,golemscore)
         keys=pygame.key.get_pressed()
         handlemovement(cr,gr,keys)
         for i in pygame.event.get():
@@ -91,7 +105,7 @@ def main():
         if random.randint(1,100) < 5:
             bullet=pygame.Rect(gr.x , gr.y + gr.height -100, 80,60)
             boulders.append(bullet)
-        golemscore,cyborgscore = handlebullets(cr,gr,lasers,boulders,golemscore,cyborgscore)
+        cyborgscore,golemscore = handlebullets(cr,gr,lasers,boulders,cyborgscore,golemscore)
         pygame.display.update()
 
 main()
