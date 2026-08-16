@@ -10,8 +10,11 @@ border=pygame.Rect(W/2-25,0,50,H)
 Tower=pygame.transform.scale(pygame.image.load("Tower.png"),(50,H))
 laser=pygame.transform.scale(pygame.image.load("laser.png"),(100,100))
 thunder=pygame.transform.scale(pygame.image.load("thunder.png"),(100,100))
+instructorfont=pygame.font.SysFont("Arial",25,True,True)
+scorefont=pygame.font.SysFont("Arial",40)
 
-def draw(ir,th,lasers,thunders):
+
+def draw(ir,th,lasers,thunders,ironscore,thorscore):
     techwars.blit(bg,(0,0))
     techwars.blit(Ironman,(ir.x-60,ir.y-10))
     techwars.blit(Thor,(th.x-40,th.y-20))
@@ -20,6 +23,10 @@ def draw(ir,th,lasers,thunders):
         techwars.blit(laser,(i.x,i.y))
     for i in thunders:
         techwars.blit(thunder,(i.x,i.y))
+    irontext=scorefont.render(f"Score:{ironscore}",1,"red","black")
+    thortext=scorefont.render(f"score:{thorscore}",1,"blue","white")
+    techwars.blit(irontext,(50,50))
+    techwars.blit(thortext,(W-300,50))
 
 def handlemovement(ir,th,keys):
     if keys [pygame.K_w] and ir.y > 10:
@@ -40,8 +47,29 @@ def handlemovement(ir,th,keys):
         th.x-=6
     
 
-def handlebullets(ir,th,lasers,thunders):
-    pass
+def handlebullets(ir,th,lasers,thunders,ironscore,thorscore):
+
+    for i in lasers:
+        i.x+=5
+        if i.x > W:
+            lasers.remove(i)
+        if i.colliderect(th):
+            lasers.remove(i)
+            ironscore+=1
+    for i in thunders:
+        i.x-=5
+        if i.x < 0:
+            thunders.remove(i)
+        if i.colliderect(ir):
+            thunders.remove(i)
+            thorscore+=1
+            continue
+        for l in lasers:
+            if l.colliderect(i):
+                thunders.remove(i)
+                lasers.remove(l)
+                break
+    return ironscore,thorscore 
 
 
 def main():
@@ -49,11 +77,13 @@ def main():
     th=pygame.Rect(W-400,H/2,220,260)
     lasers=[]
     thunders=[]
+    ironscore=0
+    thorscore=0
 
 
 
     while True:
-        draw(ir,th,lasers,thunders)
+        draw(ir,th,lasers,thunders,ironscore,thorscore)
         keys=pygame.key.get_pressed()
         handlemovement(ir,th,keys)
         for i in pygame.event.get():
@@ -67,7 +97,7 @@ def main():
                 if i.key==pygame.K_RSHIFT:
                     bullet=pygame.Rect(th.x + th.width/-2.1, th.y + 50, 100,100)
                     thunders.append(bullet)
-        handlebullets(ir,th,lasers,thunders)
+        ironscore,thorscore=handlebullets(ir,th,lasers,thunders,ironscore,thorscore)
         pygame.display.update()
 
 main()

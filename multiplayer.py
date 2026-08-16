@@ -11,16 +11,27 @@ border=pygame.Rect(W/2-25,0,50,H)
 fence=pygame.transform.scale(pygame.image.load("Fence.png"),(50,H))
 laser=pygame.transform.scale(pygame.image.load("laser.png"),(100,100))
 boulder=pygame.transform.scale(pygame.image.load("meteor1.png"),(100,100))
-instructorfont=pygame.font.SysFont("Arial",25,True,True)
-scorefont=pygame.font.SysFont("Arial",40)
+instructorfont=pygame.font.SysFont("Arial",35,True,True)
+scorefont=pygame.font.SysFont("Arial",50,True)
 
-def draw(cr,gr,lasers,boulders,cyborgscore,golemscore):
+gamestate="start"
+instructions=["press space to start the game","cyborg vs golem warfare","use w,a,s,d to control the cyborg","golem is an AI character","press space to shoot the golem","defend your self from the boulders","who ever score 50 is the winner"]
+
+def draw(cr,gr,lasers,boulders,cyborgscore,golemscore,winner):
     techwars.blit(bg,(0,0))
     # pygame.draw.rect(techwars,"cyan",cr)
     # pygame.draw.rect(techwars,"cyan",gr)
     techwars.blit(cyborg,(cr.x-60,cr.y-10))
     techwars.blit(golem,(gr.x-40,gr.y-20))
     techwars.blit(fence,(border.x, border.y))
+
+    yp=300
+    if gamestate == "start":
+        for i in instructions:
+            text=instructorfont.render(i,1,"cyan")
+            techwars.blit(text,(W/3,yp))
+            yp=yp+80
+
     for i in lasers:
         # pygame.draw.rect(techwars,"white", i)
         techwars.blit(laser,(i.x, i.y))
@@ -30,7 +41,10 @@ def draw(cr,gr,lasers,boulders,cyborgscore,golemscore):
     cyborgtext=scorefont.render(f"Score:{cyborgscore}",1,"green")
     golemtext=scorefont.render(f"score:{golemscore}",1,"red")
     techwars.blit(cyborgtext,(50,50))
-    techwars.blit(golemtext,(W-300,50))  
+    techwars.blit(golemtext,(W-300,50)) 
+    winnertext=scorefont.render(winner,True,"purple","white")
+    techwars.blit(winnertext,(W/3,H/3)) 
+
 
 def handlemovement(cr,gr,keys):
     if keys [pygame.K_UP] and cr.y > 10:
@@ -88,10 +102,12 @@ def main():
     boulders=[]
     golemscore=0
     cyborgscore=0
+    winner=None
+
 
 
     while True:
-        draw(cr,gr,lasers,boulders,cyborgscore,golemscore)
+        draw(cr,gr,lasers,boulders,cyborgscore,golemscore,winner)
         keys=pygame.key.get_pressed()
         handlemovement(cr,gr,keys)
         for i in pygame.event.get():
@@ -106,6 +122,12 @@ def main():
             bullet=pygame.Rect(gr.x , gr.y + gr.height -100, 80,60)
             boulders.append(bullet)
         cyborgscore,golemscore = handlebullets(cr,gr,lasers,boulders,cyborgscore,golemscore)
+        if cyborgscore == 50:
+            winner="cyborg is the winner"
+        if golemscore == 50:
+            winner="golem is the winner"
+
+
         pygame.display.update()
 
 main()
